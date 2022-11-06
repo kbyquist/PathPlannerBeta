@@ -1,0 +1,68 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 1.0,
+        "y": 3.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.0,
+        "y": 3.0
+      },
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "waitTime": 0
+    },
+    {
+      "anchorPoint": {
+        "x": 3.638852608515764,
+        "y": 3.8973201396109824
+      },
+      "prevControl": {
+        "x": 3.5243793668739682,
+        "y": 2.976234054274749
+      },
+      "nextControl": {
+        "x": 3.5243793668739682,
+        "y": 2.976234054274749
+      },
+      "holonomicAngle": 0,
+      "isReversal": true,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "waitTime": 0
+    },
+    {
+      "anchorPoint": {
+        "x": 6.384623059773464,
+        "y": 2.242286222853696
+      },
+      "prevControl": {
+        "x": 5.384623059773464,
+        "y": 2.242286222853696
+      },
+      "nextControl": null,
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "waitTime": 0
+    }
+  ],
+  "markers": [
+    {
+      "position": 0.4998912464488636,
+      "name": "intakeExtend"
+    },
+    {
+      "position": 1.534434925426137,
+      "name": "intakeRetract"
+    }
+  ]
+}

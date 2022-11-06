@@ -6,9 +6,12 @@ package frc.robot.commands;
 
 import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlanner;
 import java.util.ArrayList;
@@ -27,7 +30,11 @@ public class Auto1 extends SequentialCommandGroup {
    * @param driveSubsystem The drive subsystem this command will run on
    * @param hatchSubsystem The hatch subsystem this command will run on
    */
-  public Auto1(DriveSubsystem driveSubsystem) {
-    
+  public Auto1(DriveSubsystem driveSubsystem, IntakeSubsystem intakeSubsystem) {
+    addCommands(
+      driveSubsystem.followTrajectoryCommand(pathGroup1.get(0), true),
+      new WaitCommand(1),
+      driveSubsystem.followTrajectoryCommand(pathGroup1.get(1), false)
+    );
   }
 }
