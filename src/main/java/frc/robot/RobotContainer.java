@@ -73,7 +73,7 @@ public class RobotContainer {
   }
 
   public void setEventMap() {
-    eventMap.put("intakeDeploy", new InstantCommand(m_robotIntake::intakeExtend, m_robotIntake));
+    eventMap.put("intakeExtend", new InstantCommand(m_robotIntake::intakeExtend, m_robotIntake));
     eventMap.put("intakeRetract", new InstantCommand(m_robotIntake::intakeRetract, m_robotIntake));
   }
 
