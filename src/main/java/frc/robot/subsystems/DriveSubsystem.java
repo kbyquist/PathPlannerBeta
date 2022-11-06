@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.DriveConstants.*;
 
-import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,30 +21,25 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import com.pathplanner.lib.commands.PPRamseteCommand;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.*;
 import java.util.*;
+import frc.robot.RobotContainer;
 
 import static java.lang.Math.*;
 
 public class DriveSubsystem extends SubsystemBase {
+
+  private RobotContainer m_robotContainer;
+  private HashMap<String, Command> eventMap = m_robotContainer.getEventMap();
 
   DifferentialDriveKinematics kinematics =
             new DifferentialDriveKinematics(kTrackwidthMeters);
@@ -86,11 +80,6 @@ public class DriveSubsystem extends SubsystemBase {
   public double kSlewRateRotate = 3.5;
   SlewRateLimiter rotateFilter;
   SlewRateLimiter driveFilter;
-
-  /** Shuffleboard Setup */
-  private ShuffleboardTab tabDrive = Shuffleboard.getTab(kDriveTabName);
-  private NetworkTableEntry slewRateDrive = tabDrive.add("Drive Slew Rate", kSlewRateDrive).getEntry();
-  private NetworkTableEntry slewRateTurn = tabDrive.add("Turn Slew Rate", kSlewRateRotate).getEntry();
 
   /** Creates a new Drivetrain. Initialize hardware here */
   public DriveSubsystem() {
@@ -134,7 +123,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rot the commanded rotation
    */
   public void arcadeDrive(double fwd, double rot) {
-    m_drive.arcadeDrive(driveFilter.calculate(fwd), rotateFilter.calculate(rot));
+    m_drive.arcadeDrive(driveFilter.calculate(fwd), rot);
   }
 
   public double getAverageWheelEncoderDistance() {
@@ -184,19 +173,6 @@ public class DriveSubsystem extends SubsystemBase {
   // Update the odometry in the periodic block
   m_odometry.update(
   m_gyro.getRotation2d(), m_leftWheelEncoder.getDistance(), m_rightWheelEncoder.getDistance());
-
-    // This method will be called once per scheduler run
-    // Get updated numbers for slew rates
-    double SlewRateDrive = slewRateDrive.getDouble(6.);
-    double SlewRateRotate = slewRateTurn.getDouble(6.);
-    // Compare current vs new slew rates
-    if((SlewRateDrive != kSlewRateDrive)) {kSlewRateDrive = SlewRateDrive;}
-    if((SlewRateRotate != kSlewRateRotate)) {kSlewRateRotate = SlewRateRotate;}
-    // Update slew rate limiters
-    driveFilter.reset(kSlewRateDrive);
-    //driveFilter = new SlewRateLimiter(kSlewRateDrive); //Use this if above does not work
-    rotateFilter.reset(kSlewRateRotate);
-    //rotateFilter = new SlewRateLimiter(kSlewRateRotate); //Use this if above does not work
   }
 
   @Override
@@ -205,34 +181,30 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
-public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
-  // This is just an example event map. It would be better to have a constant, global event map
-  // in your code that will be used by all path following commands.
-  HashMap<String, Command> eventMap = new HashMap<>();
-  eventMap.put("marker1", new PrintCommand("Passed marker 1"));
-  //eventMap.put("intakeDown", new IntakeDown());
+  public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
 
-  return new SequentialCommandGroup(
-      new InstantCommand(() -> {
-        // Reset odometry for the first path you run during auto
-        if(isFirstPath){
-            this.resetOdometry(traj.getInitialPose());
-        }
-      }),
-      new PPRamseteCommand(
-          traj, 
-          this::getPose, // Pose supplier
-          new RamseteController(),
-          new SimpleMotorFeedforward(DriveConstants.ksVolts, DriveConstants.kvVoltSecondsPerMeter, DriveConstants.kaVoltSecondsSquaredPerMeter),
-          this.kinematics, // DifferentialDriveKinematics
-          new PIDController(0, 0, 0), // Left controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
-          new PIDController(0, 0, 0), // Right controller (usually the same values as left controller)
-          this::tankDriveVolts, // Voltage biconsumer
-          eventMap, // This argument is optional if you don't use event markers
-          this // Requires this drive subsystem
-      )
-  );
-}
+    return new SequentialCommandGroup(
+        new InstantCommand(() -> {
+          // Reset odometry for the first path you run during auto
+          if(isFirstPath){
+              this.resetOdometry(traj.getInitialPose());
+          }
+        }),
+        new PPRamseteCommand(
+            traj, 
+            this::getPose, // Pose supplier
+            new RamseteController(),
+            new SimpleMotorFeedforward(DriveConstants.ksVolts, DriveConstants.kvVoltSecondsPerMeter, DriveConstants.kaVoltSecondsSquaredPerMeter),
+            this.kinematics, // DifferentialDriveKinematics
+            this::getWheelSpeeds,
+            new PIDController(0, 0, 0), // Left controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+            new PIDController(0, 0, 0), // Right controller (usually the same values as left controller)
+            this::tankDriveVolts, // Voltage biconsumer
+            eventMap, // This argument is optional if you don't use event markers
+            this // Requires this drive subsystem
+        )
+    );
+  }
 
 }
 
