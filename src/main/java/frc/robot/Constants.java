@@ -15,16 +15,16 @@ public final class Constants {
     }
 
     public static final class DriveConstants {
-        public static final int[] kLeftDriveMotors = new int[] {0,1,2};
-        public static final int[] kRightDriveMotors = new int[] {3,4,5};
+        public static final int[] kLeftDriveMotors = new int[] {3,7,8};
+        public static final int[] kRightDriveMotors = new int[] {4,5,6};
 
         public static final boolean kLeftMotorInverted = true;
         public static final boolean kRightMotorInverted = false;
 
         public static final int[] kLeftWheelEncoderPorts = new int[] {0, 1};
         public static final int[] kRightWheelEncoderPorts = new int[] {2, 3};
-        public static final boolean kLeftWheelEncoderReversed = true;
-        public static final boolean kRightWheelEncoderReversed = false;
+        public static final boolean kLeftWheelEncoderReversed = false;
+        public static final boolean kRightWheelEncoderReversed = true;
         public static final int kWheelEncoderCountsPerRevolution = 2048;
 
         public static final double kWheelDiameterIN = 6.;
@@ -37,9 +37,9 @@ public final class Constants {
             // Assumes the encoders are directly mounted on the wheel shafts
             (kWheelDiameterMeters * Math.PI) / (double) kWheelEncoderCountsPerRevolution;
 
-        public static final double ksVolts = 0.22;
-        public static final double kvVoltSecondsPerMeter = .0002936;
-        public static final double kaVoltSecondsSquaredPerMeter = 0.0010696;
+        public static final double ksVolts = 0.15;
+        public static final double kvVoltSecondsPerMeter = .3;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.20696;
 
         // Example value only - as above, this must be tuned for your drive!
         public static final double kPDriveVel = 8.5;

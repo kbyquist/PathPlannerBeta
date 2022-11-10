@@ -32,7 +32,7 @@ public class RobotContainer {
 
   private final Command m_auto1 = new Auto1(m_robotDrive, m_robotIntake);
 
-  PS4Controller m_driveController = new PS4Controller(OIConstants.kDriveControllerInput);
+  XboxController m_driveController = new XboxController(OIConstants.kDriveControllerInput);
   XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerInput);
 
   // A chooser for autonomous commands
@@ -69,6 +69,9 @@ public class RobotContainer {
     new JoystickButton(m_operatorController, XboxController.Button.kA.value)
       .whenHeld(new InstantCommand(m_robotIntake::intakeExtend, m_robotIntake))
       .whenReleased(new InstantCommand(m_robotIntake::intakeRetract, m_robotIntake));
+
+    new JoystickButton(m_operatorController, XboxController.Button.kY.value)
+      .whenPressed(m_auto1);
   }
 
   public void setEventMap() {

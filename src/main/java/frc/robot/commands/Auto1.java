@@ -37,7 +37,7 @@ public class Auto1 extends SequentialCommandGroup {
   public Auto1(DriveSubsystem driveSubsystem, IntakeSubsystem intakeSubsystem) {
     addCommands(
       driveSubsystem.followTrajectoryCommand(pathGroup1.get(0), true),
-      new WaitCommand(1),
+      new WaitCommand(pathGroup1.get(0).getEndWaitTimeSeconds()),
       driveSubsystem.followTrajectoryCommand(pathGroup1.get(1), false)
     );
   }

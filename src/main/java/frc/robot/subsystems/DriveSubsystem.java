@@ -90,7 +90,6 @@ public class DriveSubsystem extends SubsystemBase {
     //Pathfollowing
     resetWheelEncoders();
     m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
-
     /* Restore Defaults of Motors. 
     Doing this confirms the settings will be the same no matter what physical controller is used  */
     m_leftLead.restoreFactoryDefaults();
@@ -158,7 +157,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   public double getHeading() { return m_gyro.getRotation2d().getDegrees(); }
 
-  public double getTurnRate() { return -m_gyro.getRate(); }
+  public double getTurnRate() { return m_gyro.getRate(); }
 
   public void tankDriveVolts(double leftVolts, double rightVolts) {
     m_leftLead.setVoltage(leftVolts);
