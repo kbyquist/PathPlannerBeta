@@ -4,7 +4,7 @@
 
 package frc.robot.commands;
 
-import frc.robot.Constants.AutoConstants;
+import static frc.robot.Constants.AutoConstants.*;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -18,17 +18,21 @@ import java.util.ArrayList;
 import com.pathplanner.lib.PathConstraints;
 
 
-
 /** A complex auto command that drives forward, releases a hatch, and then drives backward. */
 public class Auto1 extends SequentialCommandGroup {
 
-  ArrayList<PathPlannerTrajectory> pathGroup1 = PathPlanner.loadPathGroup("Auto1", new PathConstraints(4, 3));
+  ArrayList<PathPlannerTrajectory> pathGroup1 
+    = PathPlanner.loadPathGroup(
+      "Auto1",
+      new PathConstraints(
+        kMaxSpeedMetersPerSecond, //Velocity
+        kMaxAccelerationMetersPerSecondSquared)); //Acceleration
 
   /**
    * Creates a new ComplexAutoCommand.
    *
    * @param driveSubsystem The drive subsystem this command will run on
-   * @param hatchSubsystem The hatch subsystem this command will run on
+   * @param intakeSubsystem The hatch subsystem this command will run on
    */
   public Auto1(DriveSubsystem driveSubsystem, IntakeSubsystem intakeSubsystem) {
     addCommands(

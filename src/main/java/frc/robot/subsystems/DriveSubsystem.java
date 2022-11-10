@@ -6,13 +6,13 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.DriveConstants.*;
 
-
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.networktables.NetworkTableEntry;
+
+import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -25,27 +25,25 @@ import edu.wpi.first.math.controller.PIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.SystemConstants;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
-import java.util.*;
-import frc.robot.RobotContainer;
 
 import static java.lang.Math.*;
 
 public class DriveSubsystem extends SubsystemBase {
 
-  private RobotContainer m_robotContainer;
-  private HashMap<String, Command> eventMap = m_robotContainer.getEventMap();
-
   DifferentialDriveKinematics kinematics =
             new DifferentialDriveKinematics(kTrackwidthMeters);
 
   // The gyro sensor
-  private final Gyro m_gyro = new ADXRS450_Gyro();
+  private final AHRS m_gyro = new AHRS(SPI.Port.kMXP);
 
   // Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
@@ -81,8 +79,14 @@ public class DriveSubsystem extends SubsystemBase {
   SlewRateLimiter rotateFilter;
   SlewRateLimiter driveFilter;
 
+  private ShuffleboardTab tabDrive = Shuffleboard.getTab(kDriveTabName);
+
+
+
   /** Creates a new Drivetrain. Initialize hardware here */
   public DriveSubsystem() {
+
+    Shuffleboard.getTab(kDriveTabName).add(m_gyro);
     //Pathfollowing
     resetWheelEncoders();
     m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
@@ -194,13 +198,13 @@ public class DriveSubsystem extends SubsystemBase {
             traj, 
             this::getPose, // Pose supplier
             new RamseteController(),
-            new SimpleMotorFeedforward(DriveConstants.ksVolts, DriveConstants.kvVoltSecondsPerMeter, DriveConstants.kaVoltSecondsSquaredPerMeter),
+            new SimpleMotorFeedforward(ksVolts, kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter),
             this.kinematics, // DifferentialDriveKinematics
             this::getWheelSpeeds,
             new PIDController(0, 0, 0), // Left controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
             new PIDController(0, 0, 0), // Right controller (usually the same values as left controller)
             this::tankDriveVolts, // Voltage biconsumer
-            eventMap, // This argument is optional if you don't use event markers
+            SystemConstants.eventMap, // This argument is optional if you don't use event markers
             this // Requires this drive subsystem
         )
     );

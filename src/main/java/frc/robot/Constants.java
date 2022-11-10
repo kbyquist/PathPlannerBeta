@@ -4,14 +4,19 @@
 
 package frc.robot;
 
+import java.util.HashMap;
 
+import edu.wpi.first.wpilibj2.command.Command;
 
 public final class Constants {
+    public static final class SystemConstants {
+        public static final int kPcmCanID = 33;
+        public static HashMap<String, Command> eventMap = new HashMap<String, Command>();
+    }
+
     public static final class DriveConstants {
         public static final int[] kLeftDriveMotors = new int[] {0,1,2};
         public static final int[] kRightDriveMotors = new int[] {3,4,5};
-
-        public static final int kPcmCanID = 33;
 
         public static final boolean kLeftMotorInverted = true;
         public static final boolean kRightMotorInverted = false;
@@ -32,11 +37,6 @@ public final class Constants {
             // Assumes the encoders are directly mounted on the wheel shafts
             (kWheelDiameterMeters * Math.PI) / (double) kWheelEncoderCountsPerRevolution;
 
-        // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
-        // These characterization values MUST be determined either experimentally or theoretically
-        // for *your* robot's drive.
-        // The Robot Characterization Toolsuite provides a convenient tool for obtaining these
-        // values for your robot.
         public static final double ksVolts = 0.22;
         public static final double kvVoltSecondsPerMeter = .0002936;
         public static final double kaVoltSecondsSquaredPerMeter = 0.0010696;
@@ -49,7 +49,6 @@ public final class Constants {
         public static final int kDriveControllerInput = 0;
         public static final int kOperatorControllerInput = 1;
     }
-    
 
     public static final class AutoConstants {
         public static final double kMaxSpeedMetersPerSecond = 3;

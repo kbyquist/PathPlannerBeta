@@ -8,14 +8,15 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.SystemConstants;
+
 import static frc.robot.Constants.IntakeConstants.*;
 
 public class IntakeSubsystem extends SubsystemBase {
 
   private final DoubleSolenoid m_intakeSolenoid = 
     new DoubleSolenoid(
-      DriveConstants.kPcmCanID,
+      SystemConstants.kPcmCanID,
       PneumaticsModuleType.CTREPCM,
       kIntakeSolenoidID[0],
       kIntakeSolenoidID[1]

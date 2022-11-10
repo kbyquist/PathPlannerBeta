@@ -8,8 +8,6 @@ import frc.robot.commands.Auto1;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
-import java.util.HashMap;
-
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.subsystems.DriveSubsystem;
@@ -19,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.SystemConstants;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -31,7 +30,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final IntakeSubsystem m_robotIntake = new IntakeSubsystem();
 
-  private final Command m_auto1 = new Auto1(m_robotDrive);
+  private final Command m_auto1 = new Auto1(m_robotDrive, m_robotIntake);
 
   PS4Controller m_driveController = new PS4Controller(OIConstants.kDriveControllerInput);
   XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerInput);
@@ -39,8 +38,8 @@ public class RobotContainer {
   // A chooser for autonomous commands
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
-  //PathPlanner Event Map
-  public HashMap<String, Command> eventMap = new HashMap<String, Command>();
+  // //PathPlanner Event Map
+  // public static HashMap<String, Command> eventMap = new HashMap<String, Command>();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -73,12 +72,8 @@ public class RobotContainer {
   }
 
   public void setEventMap() {
-    eventMap.put("intakeExtend", new InstantCommand(m_robotIntake::intakeExtend, m_robotIntake));
-    eventMap.put("intakeRetract", new InstantCommand(m_robotIntake::intakeRetract, m_robotIntake));
-  }
-
-public HashMap<String, Command> getEventMap() {
-    return eventMap;
+    SystemConstants.eventMap.put("intakeExtend", new InstantCommand(m_robotIntake::intakeExtend, m_robotIntake));
+    SystemConstants.eventMap.put("intakeRetract", new InstantCommand(m_robotIntake::intakeRetract, m_robotIntake));
   }
 
 
