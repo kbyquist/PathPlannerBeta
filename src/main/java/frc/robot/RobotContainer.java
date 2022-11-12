@@ -36,7 +36,7 @@ public class RobotContainer {
   XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerInput);
 
   // A chooser for autonomous commands
-  SendableChooser<Command> m_chooser = new SendableChooser<>();
+  SendableChooser<Command> m_autonomouschooser = new SendableChooser<>();
 
   // //PathPlanner Event Map
   // public static HashMap<String, Command> eventMap = new HashMap<String, Command>();
@@ -54,7 +54,7 @@ public class RobotContainer {
             m_robotDrive)
     );
 
-    m_chooser.setDefaultOption("Auto 1", m_auto1);
+    m_autonomouschooser.setDefaultOption("Auto 1", m_auto1);
 
     setEventMap();
   }
@@ -87,6 +87,6 @@ public class RobotContainer {
     * @return the command to run in autonomous
     */
     public Command getAutonomousCommand() {
-      return m_chooser.getSelected();
+      return m_autonomouschooser.getSelected();
       }
 }
