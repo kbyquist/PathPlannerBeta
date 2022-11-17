@@ -11,6 +11,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -81,6 +82,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   private ShuffleboardTab tabDrive = Shuffleboard.getTab(kDriveTabName);
 
+  NetworkTableEntry m_xEntry = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("X");
+  NetworkTableEntry m_yEntry = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("Y");
+
+
 
 
   /** Creates a new Drivetrain. Initialize hardware here */
@@ -112,8 +117,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_leftLead.setInverted(kLeftMotorInverted);
 
     /* Encoder Conversion */
-    m_leftWheelEncoder.setDistancePerPulse(360./kWheelEncoderCountsPerRevolution);
-    m_rightWheelEncoder.setDistancePerPulse(360./kWheelEncoderCountsPerRevolution);
+    m_leftWheelEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
+    m_rightWheelEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
 
     driveFilter = new SlewRateLimiter(kSlewRateDrive);
     rotateFilter = new SlewRateLimiter(kSlewRateRotate);
@@ -176,6 +181,11 @@ public class DriveSubsystem extends SubsystemBase {
   // Update the odometry in the periodic block
   m_odometry.update(
   m_gyro.getRotation2d(), m_leftWheelEncoder.getDistance(), m_rightWheelEncoder.getDistance());
+
+  var translation = m_odometry.getPoseMeters().getTranslation();
+  m_xEntry.setNumber(translation.getX());
+  m_yEntry.setNumber(translation.getY());
+
   }
 
   @Override

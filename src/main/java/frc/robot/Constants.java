@@ -30,16 +30,16 @@ public final class Constants {
         public static final double kWheelDiameterIN = 6.;
 
         public static final String kDriveTabName = "Drive Subsystem";
-        public static final double kTrackwidthMeters = 0.69;
+        public static final double kTrackwidthMeters = 25/39.37;
 
         public static final double kWheelDiameterMeters = kWheelDiameterIN/39.37;
         public static final double kEncoderDistancePerPulse =
             // Assumes the encoders are directly mounted on the wheel shafts
             (kWheelDiameterMeters * Math.PI) / (double) kWheelEncoderCountsPerRevolution;
 
-        public static final double ksVolts = 0.15;
-        public static final double kvVoltSecondsPerMeter = .3;
-        public static final double kaVoltSecondsSquaredPerMeter = 0.20696;
+        public static final double ksVolts = 0.22105;
+        public static final double kvVoltSecondsPerMeter = .29;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.010696;
 
         // Example value only - as above, this must be tuned for your drive!
         public static final double kPDriveVel = 8.5;
