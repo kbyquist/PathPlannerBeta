@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.DriveConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
@@ -20,17 +21,22 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import com.pathplanner.lib.commands.PPRamseteCommand;
+import com.pathplanner.lib.server.PathPlannerServer;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.SystemConstants;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -76,15 +82,13 @@ public class DriveSubsystem extends SubsystemBase {
 
   // Creates a SlewRateLimiter that limits the rate of change of the signal to defined constant units per second
   public double kSlewRateDrive = 3.5;
-  public double kSlewRateRotate = 3.5;
-  SlewRateLimiter rotateFilter;
   SlewRateLimiter driveFilter;
 
   private ShuffleboardTab tabDrive = Shuffleboard.getTab(kDriveTabName);
 
   NetworkTableEntry m_xEntry = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("X");
   NetworkTableEntry m_yEntry = NetworkTableInstance.getDefault().getTable("troubleshooting").getEntry("Y");
-
+  NetworkTableEntry netGyroAngle = tabDrive.add("Gyro Angle", 0).getEntry();
 
 
 
@@ -93,8 +97,14 @@ public class DriveSubsystem extends SubsystemBase {
 
     Shuffleboard.getTab(kDriveTabName).add(m_gyro);
     //Pathfollowing
+  
+    m_gyro.reset();
+    m_gyro.calibrate();
+
     resetWheelEncoders();
-    m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
+    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(m_gyro.getAngle())); //Turns wrong way
+    // m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
+    m_odometry.resetPosition(new Pose2d(), m_gyro.getRotation2d());
     /* Restore Defaults of Motors. 
     Doing this confirms the settings will be the same no matter what physical controller is used  */
     m_leftLead.restoreFactoryDefaults();
@@ -121,7 +131,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_rightWheelEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
 
     driveFilter = new SlewRateLimiter(kSlewRateDrive);
-    rotateFilter = new SlewRateLimiter(kSlewRateRotate);
+    PathPlannerServer.startServer(5811);
   }
 
   /**
@@ -160,9 +170,13 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void zeroHeading() { m_gyro.reset(); }
 
-  public double getHeading() { return m_gyro.getRotation2d().getDegrees(); }
+  public double getHeading() { return m_gyro.getAngle(); }
 
   public double getTurnRate() { return m_gyro.getRate(); }
+
+  public Gyro getGyro() {
+    return m_gyro;
+  }
 
   public void tankDriveVolts(double leftVolts, double rightVolts) {
     m_leftLead.setVoltage(leftVolts);
@@ -172,7 +186,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void resetOdometry(Pose2d pose) {
     resetWheelEncoders();
-    m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+    // m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+    m_odometry.resetPosition(pose, Rotation2d.fromDegrees(m_gyro.getAngle())); //Turns wrong way
+
   }
   
 
@@ -180,7 +196,10 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
   // Update the odometry in the periodic block
   m_odometry.update(
-  m_gyro.getRotation2d(), m_leftWheelEncoder.getDistance(), m_rightWheelEncoder.getDistance());
+    // m_gyro.getRotation2d(), m_leftWheelEncoder.getDistance(), m_rightWheelEncoder.getDistance());
+    Rotation2d.fromDegrees(m_gyro.getAngle()), m_leftWheelEncoder.getDistance(), m_rightWheelEncoder.getDistance()); //Turns wrong way
+    
+  netGyroAngle.setValue(-m_gyro.getAngle());
 
   var translation = m_odometry.getPoseMeters().getTranslation();
   m_xEntry.setNumber(translation.getX());
@@ -206,12 +225,12 @@ public class DriveSubsystem extends SubsystemBase {
         new PPRamseteCommand(
             traj, 
             this::getPose, // Pose supplier
-            new RamseteController(),
+            new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
             new SimpleMotorFeedforward(ksVolts, kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter),
             this.kinematics, // DifferentialDriveKinematics
             this::getWheelSpeeds,
-            new PIDController(0, 0, 0), // Left controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
-            new PIDController(0, 0, 0), // Right controller (usually the same values as left controller)
+            new PIDController(kPDriveVel, 0, 0), // Left controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+            new PIDController(kPDriveVel, 0, 0), // Right controller (usually the same values as left controller)
             this::tankDriveVolts, // Voltage biconsumer
             SystemConstants.eventMap, // This argument is optional if you don't use event markers
             this // Requires this drive subsystem

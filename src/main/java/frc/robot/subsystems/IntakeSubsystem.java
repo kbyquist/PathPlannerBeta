@@ -23,7 +23,9 @@ public class IntakeSubsystem extends SubsystemBase {
     );
 
   /** Creates a new IntakeSubsystem. */
-  public IntakeSubsystem() {}
+  public IntakeSubsystem() {
+    intakeRetract();
+  }
 
   public void intakeExtend() {
     m_intakeSolenoid.set(Value.kForward);

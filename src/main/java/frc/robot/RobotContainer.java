@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -50,10 +51,10 @@ public class RobotContainer {
       new RunCommand(
             () ->
                 m_robotDrive.arcadeDrive(
-                    m_driveController.getLeftY(), m_driveController.getRightX()),
+                    -m_driveController.getLeftY(), -m_driveController.getRightX()),
             m_robotDrive)
     );
-
+    Shuffleboard.getTab("Auto Chooser").add(m_autonomouschooser);
     m_autonomouschooser.setDefaultOption("Auto 1", m_auto1);
 
     setEventMap();
@@ -66,11 +67,11 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_operatorController, XboxController.Button.kA.value)
+    new JoystickButton(m_driveController, XboxController.Button.kA.value)
       .whenHeld(new InstantCommand(m_robotIntake::intakeExtend, m_robotIntake))
       .whenReleased(new InstantCommand(m_robotIntake::intakeRetract, m_robotIntake));
 
-    new JoystickButton(m_operatorController, XboxController.Button.kY.value)
+    new JoystickButton(m_driveController, XboxController.Button.kY.value)
       .whenPressed(m_auto1);
   }
 
