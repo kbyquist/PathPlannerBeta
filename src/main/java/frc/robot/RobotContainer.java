@@ -4,11 +4,12 @@
 
 package frc.robot;
 
-import frc.robot.commands.Auto1;
-
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
-import edu.wpi.first.wpilibj.PS4Controller;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.RamseteAutoBuilder;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.subsystems.DriveSubsystem;
@@ -17,6 +18,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SystemConstants;
 
@@ -27,36 +30,61 @@ import frc.robot.Constants.SystemConstants;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
+  // The robot's subsystems and commands are defined here
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final IntakeSubsystem m_robotIntake = new IntakeSubsystem();
 
-  private final Command m_auto1 = new Auto1(m_robotDrive, m_robotIntake);
-
+  // Controller IO Objects
   XboxController m_driveController = new XboxController(OIConstants.kDriveControllerInput);
   XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerInput);
+
+  /* Auto Builder */
+  // Using the PathPlanner RamseteAutoBuilder constructor to create an AutoBuilder
+  RamseteAutoBuilder autoBuilder = new RamseteAutoBuilder(
+    m_robotDrive::getPose,
+    m_robotDrive::resetOdometry,
+    new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
+    m_robotDrive.kinematics,
+    new SimpleMotorFeedforward(DriveConstants.ksVolts, DriveConstants.kvVoltSecondsPerMeter, DriveConstants.kaVoltSecondsSquaredPerMeter),
+    m_robotDrive::getWheelSpeeds,
+    new PIDConstants(DriveConstants.kPDriveVel, 0.0, 0.0),
+    m_robotDrive::tankDriveVolts,
+    SystemConstants.eventMap,
+    m_robotDrive
+    );
+  
+  /* Auto Commands
+      Using the autoBuilder object constructed above, we can create an entire auto routine with the following:
+        - Name of the command
+        - Path group for that specific auto
+          - This is defined in the AutoPaths.java file
+      
+  */
+  private final Command m_auto1 = autoBuilder.fullAuto(AutoPaths.pathGroupAuto1); 
 
   // A chooser for autonomous commands
   SendableChooser<Command> m_autonomouschooser = new SendableChooser<>();
 
-  // //PathPlanner Event Map
-  // public static HashMap<String, Command> eventMap = new HashMap<String, Command>();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-
+    
+    // Set the default command for the drive system
     m_robotDrive.setDefaultCommand(
       new RunCommand(
             () ->
                 m_robotDrive.arcadeDrive(
-                    -m_driveController.getLeftY(), -m_driveController.getRightX()),
+                    -m_driveController.getLeftY(), m_driveController.getRightX()),
             m_robotDrive)
     );
+
+    // Add a sendable chooser to shuffleboard on the "Auto Chooser" tab
     Shuffleboard.getTab("Auto Chooser").add(m_autonomouschooser);
     m_autonomouschooser.setDefaultOption("Auto 1", m_auto1);
 
+    // Populate the autonomous event map
     setEventMap();
   }
 
@@ -75,6 +103,10 @@ public class RobotContainer {
       .whenPressed(m_auto1);
   }
 
+  /**
+   * Use this method to set any and all commands that are defined in the PathPlanner autonomous paths.
+   * These events are case sensitive and should exactly match those in the PathPlanner app.
+   */
   public void setEventMap() {
     SystemConstants.eventMap.put("intakeExtend", new InstantCommand(m_robotIntake::intakeExtend, m_robotIntake));
     SystemConstants.eventMap.put("intakeRetract", new InstantCommand(m_robotIntake::intakeRetract, m_robotIntake));

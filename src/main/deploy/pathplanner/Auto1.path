@@ -2,49 +2,112 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.0,
-        "y": 3.0
+        "x": 2.750833873249778,
+        "y": 3.095736301335884
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5420569582537325,
-        "y": 3.0
+        "x": 0.8704562837592472,
+        "y": 3.066101771851981
       },
       "holonomicAngle": 0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
-      "waitTime": 0
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
     },
     {
       "anchorPoint": {
-        "x": 2.3050964681030925,
-        "y": 3.0037408024034797
+        "x": 2.710069303195247,
+        "y": 5.292381497848933
       },
       "prevControl": {
-        "x": 1.7364354648885456,
-        "y": 3.0037408024034797
+        "x": 1.196767056247228,
+        "y": 5.2985624931045745
       },
       "nextControl": {
-        "x": 2.8737574713176395,
-        "y": 3.0037408024034797
+        "x": 4.281111434542228,
+        "y": 5.2859646673843965
+      },
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 2.8405020677228854,
+        "y": 3.176093417616523
+      },
+      "prevControl": {
+        "x": 4.4946695240070165,
+        "y": 3.100810420370841
+      },
+      "nextControl": {
+        "x": 0.7583607071732472,
+        "y": 3.270853982344049
       },
       "holonomicAngle": 0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": true,
-      "waitTime": 3.0
+      "stopEvent": {
+        "names": [
+          "intakeExtend",
+          "intakeRetract"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "before",
+        "waitTime": 2.0
+      }
     },
     {
       "anchorPoint": {
-        "x": 3.819994937353156,
-        "y": 2.1541704948644274
+        "x": 2.5257187916719586,
+        "y": 0.8708806773082296
       },
       "prevControl": {
-        "x": 3.2986019988153257,
-        "y": 2.1558424891752126
+        "x": 0.24122601482734307,
+        "y": 0.8708806773082296
+      },
+      "nextControl": {
+        "x": 4.810211568516577,
+        "y": 0.8708806773082296
+      },
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 2.1504860612260286,
+        "y": 3.1629816335804546
+      },
+      "prevControl": {
+        "x": 4.124779733934479,
+        "y": 3.1602199361625285
       },
       "nextControl": null,
       "holonomicAngle": 0,
@@ -52,20 +115,41 @@
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
-      "waitTime": 0
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
     }
   ],
-  "maxVelocity": 0.75,
-  "maxAcceleration": 0.25,
+  "maxVelocity": 2.0,
+  "maxAcceleration": 1.0,
   "isReversed": null,
   "markers": [
     {
-      "position": 0.458633700284091,
-      "name": "intakeExtend"
+      "position": 0.630428799715909,
+      "names": [
+        "intakeExtend"
+      ]
     },
     {
-      "position": 1.534434925426137,
-      "name": "intakeRetract"
+      "position": 1.6321644176136356,
+      "names": [
+        "intakeRetract"
+      ]
+    },
+    {
+      "position": 2.761514559659092,
+      "names": [
+        "intakeExtend"
+      ]
+    },
+    {
+      "position": 3.596058238636364,
+      "names": [
+        "intakeRetract"
+      ]
     }
   ]
 }
